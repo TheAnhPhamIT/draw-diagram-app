@@ -101,12 +101,21 @@ export function StepNodeProvider({ children }: PropsWithChildren) {
       .map((link) => link.to);
 
     let newNodePositionY = fromY;
-    for (const node of nodes) {
-      if (toNodeIds.indexOf(node.id) < 0) continue;
-      const { y } = node.shape.positions;
-      if (y >= newNodePositionY) {
-        newNodePositionY = y + nodesSize[node.shape.type].height + 20;
+    if (toNodeIds.length > 0) {
+      for (const node of nodes) {
+        if (toNodeIds.indexOf(node.id) < 0) continue;
+        const { y } = node.shape.positions;
+        const { height } = nodesSize[node.shape.type];
+        if (y + height >= newNodePositionY) {
+          newNodePositionY = y + height + 20;
+        }
       }
+    }
+
+    if (newNodePositionY === fromY) {
+      const { height: newNodeHeight } = nodesSize[shapeType];
+      const { height: fromNodeHeight } = nodesSize[fromNode.shape.type];
+      newNodePositionY -= Math.floor((newNodeHeight - fromNodeHeight) / 2);
     }
 
     const newNode = {
